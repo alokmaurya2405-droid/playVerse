@@ -1,0 +1,135 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Gaming Platform Auth API",
+    "description": "Production-grade authentication engine providing unified login (Email/Username) and age-gated registration.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/"
+    }
+  ],
+  "paths": {
+    "/api/auth/signup": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register a new gamer account",
+        "description": "",
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupInput"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Authenticate using Email or Username",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SignupInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "player1@example.com"
+          },
+          "username": {
+            "type": "string",
+            "example": "GamerX"
+          },
+          "password": {
+            "type": "string",
+            "example": "StrongPassword123!"
+          },
+          "dob": {
+            "type": "string",
+            "example": "2010-06-15"
+          }
+        },
+        "xml": {
+          "name": "SignupInput"
+        }
+      },
+      "LoginInput": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string",
+            "example": "GamerX"
+          },
+          "password": {
+            "type": "string",
+            "example": "StrongPassword123!"
+          }
+        },
+        "xml": {
+          "name": "LoginInput"
+        }
+      }
+    }
+  }
+}
