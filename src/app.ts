@@ -1,27 +1,33 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
+import fs from 'fs';
+import path from 'path';
 import authRoutes from './routes/auth';
-import swaggerDocument from './swagger-output.json';
 import { connectDatabase } from './config/db';
 
-// 1. Initialize environment variables immediately
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-// 2. Connect to Database Cluster
 connectDatabase();
 
-// 3. Mount API Routes & Documentation
+// Mount API Routes
 app.use('/api/auth', authRoutes);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Compiler-safe dynamic loading for Swagger
+const swaggerPath = path.join(__dirname, 'swagger-output.json');
+if (fs.existsSync(swaggerPath)) {
+  const swaggerDocument = JSON.parse(fs.readFileSync(swaggerPath, 'utf8'));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+} else {
+  console.log('⚠️ Swagger documentation file not found yet. Running in background generation mode.');
+}
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`\n🚀 Server roaring on: http://localhost:${PORT}`);
-  console.log(`📄 Swagger Docs open at: http://localhost:${PORT}/api-docs\n`);
 });
 
 export default app;
