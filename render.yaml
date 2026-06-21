@@ -2,7 +2,7 @@ services:
   - type: web
     name: playverse-backend
     runtime: node
-    buildCommand: npm install && npm run build
+    buildCommand: mkdir -p src && echo "{}" > src/swagger-output.json && npm install && npm run build
     startCommand: node dist/app.js
     envVars:
       - key: NODE_VERSION
