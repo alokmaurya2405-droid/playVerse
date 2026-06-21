@@ -5,7 +5,8 @@ import fs from 'fs';
 import path from 'path';
 import authRoutes from './routes/auth';
 import { connectDatabase } from './config/db';
-
+const devSwaggerPath = path.join(process.cwd(), 'src', 'swagger-output.json');
+const prodSwaggerPath = path.join(__dirname, 'swagger-output.json');
 dotenv.config();
 
 const app = express();
@@ -17,12 +18,18 @@ connectDatabase();
 app.use('/api/auth', authRoutes);
 
 // Compiler-safe dynamic loading for Swagger
-const swaggerPath = path.join(__dirname, 'swagger-output.json');
+let swaggerPath = fs.existsSync(prodSwaggerPath) ? prodSwaggerPath : devSwaggerPath;
+
 if (fs.existsSync(swaggerPath)) {
-  const swaggerDocument = JSON.parse(fs.readFileSync(swaggerPath, 'utf8'));
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  try {
+    const swaggerDocument = JSON.parse(fs.readFileSync(swaggerPath, 'utf8'));
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    console.log(`✅ Swagger Docs successfully mounted from: ${swaggerPath}`);
+  } catch (parseError) {
+    console.error('❌ Failed to parse swagger-output.json:', parseError);
+  }
 } else {
-  console.log('⚠️ Swagger documentation file not found yet. Running in background generation mode.');
+  console.error('❌ CRITICAL: swagger-output.json could not be found anywhere in the deployment tree.');
 }
 
 const PORT = process.env.PORT || 8080;
